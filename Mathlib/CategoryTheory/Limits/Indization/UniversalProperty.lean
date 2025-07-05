@@ -13,11 +13,8 @@ variable {C : Type u} {D : Type u'} [Category.{v} C] [Category.{v} D]
 namespace CategoryTheory
 
 variable (C D) in
-abbrev Functor' := ObjectProperty.FullSubcategory
-  (C := Ind C ⥤ D) (fun G ↦ PreservesFilteredColimitsOfSize.{v, v} G)
-
-variable (C D) in
-def Ind.precompYoneda : Functor' C D ⥤ C ⥤ D :=
+def Ind.precompYoneda : ObjectProperty.FullSubcategory
+    (C := Ind C ⥤ D) (fun G ↦ PreservesFilteredColimitsOfSize.{v, v} G) ⥤ C ⥤ D :=
   ObjectProperty.ι _ ⋙ (whiskeringLeft _ _ _).obj Ind.yoneda
 
 def Ind.costructuredArrowEquivalence (X : Ind C) :
@@ -122,10 +119,23 @@ instance (F : C ⥤ D) : PreservesFilteredColimitsOfSize.{v, v} (Ind.lan.obj F) 
     --   infer_instance
 
     --
-    have : H.IsLeftKanExtension ((yoneda ⋙ (whiskeringRight _ _ _).obj
-        uliftFunctor.{max u' v}).leftKanExtensionUnit (F ⋙ i)) := by stop
-      dsimp [H]
+    let u : (Cᵒᵖ ⥤ Type v) ⥤ (Cᵒᵖ ⥤ _) := (whiskeringRight _ _ _).obj uliftFunctor.{max u' v}
+
+    let γ : F ⋙ i ⟶ (yoneda ⋙ u) ⋙ H := ((yoneda ⋙ (whiskeringRight _ _ _).obj
+        uliftFunctor.{max u' v}).leftKanExtensionUnit (F ⋙ i))
+
+    have : H.IsLeftKanExtension γ := by stop
       infer_instance
+
+    let j : Ind.yoneda ⋙ Ind.inclusion C ≅ yoneda := Ind.yonedaCompInclusion
+
+    let γ' : F ⋙ i ⟶ ((Ind.yoneda ⋙ Ind.inclusion C) ⋙ u) ⋙ H :=
+      γ ≫ (isoWhiskerRight j (u ⋙ H)).inv
+
+    have hγ' : γ' = α := rfl
+
+    have : H.IsLeftKanExtension γ'  :=
+      sorry
 
     have hα : (Ind.inclusion C ⋙
         (whiskeringRight _ _ _).obj uliftFunctor.{max u' v} ⋙ H).IsLeftKanExtension α := by
@@ -140,7 +150,7 @@ instance (F : C ⥤ D) : PreservesFilteredColimitsOfSize.{v, v} (Ind.lan.obj F) 
       apply preservesColimitsOfShape_of_reflects_of_preserves _ i
     exact preservesColimitsOfShape_of_natIso e
 
-lemma foo : (Ind.lan (C := C) (D := D)).essImage =
+lemma lanEssImage_eq_preservesFilteredColimitsOfSize : (Ind.lan (C := C) (D := D)).essImage =
     (fun G ↦ PreservesFilteredColimitsOfSize.{v, v} G) := by
   ext F
   constructor
@@ -159,12 +169,11 @@ lemma foo : (Ind.lan (C := C) (D := D)).essImage =
         (preservesColimitIso F _).symm ≪≫ F.mapIso X.isoColimit.symm) ?_
     sorry
 
-/--
-`Functor' C D` is the full subcategory of `Ind C ⥤ D` spanned by the functors which preserve
-filtered colimits.
--/
-def Ind.universalProperty : Functor' C D ≌ C ⥤ D :=
-  Equivalence.trans (ObjectProperty.fullSubcategoryCongr (foo (C := C) (D := D))).symm
+def Ind.universalProperty :
+    ObjectProperty.FullSubcategory (C := Ind C ⥤ D)
+      (fun G ↦ PreservesFilteredColimitsOfSize.{v, v} G) ≌ C ⥤ D :=
+  Equivalence.trans (ObjectProperty.fullSubcategoryCongr
+    (lanEssImage_eq_preservesFilteredColimitsOfSize (C := C) (D := D))).symm
     (asEquivalence ((Ind.lan (C := C) (D := D)).toEssImage)).symm
 
 end CategoryTheory
