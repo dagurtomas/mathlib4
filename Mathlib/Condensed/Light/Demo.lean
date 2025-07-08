@@ -1,15 +1,19 @@
 import Mathlib
 
-example (x y z : ℝ) : (x + y + z) * (x + y - z) * (x - y + z) * (-x + y + z) =
-    2 * x ^ 2 * y ^ 2 + 2 * x ^ 2 * z ^ 2 + 2 * y ^ 2 * z ^ 2 - x ^ 4  - y ^ 4 - z ^ 4 := by
-  sorry
+namespace Demo
 
-example (A B : Prop) : ¬ A ∨ ¬ (¬ B ∧ (¬ A ∨ B)) := by
-  sorry
+def Odd (n : ℕ) : Prop := ∃ k : ℕ, n = 2 * k + 1
 
-open CategoryTheory
+theorem odd_one : Odd 1 := by
+  unfold Odd
+  use 0
 
-example (C D : Type) [Category C] [Category D]
-    (X Y Z : C) (f : X ⟶ Y) (g : Y ⟶ Z) (F : C ⥤ D) :
-    F.map (f ≫ g) = F.map f ≫ F.map g := by
-  sorry
+theorem odd_mul_odd (n m : ℕ) (hn : Odd n) (hm : Odd m) : Odd (n * m) := by
+  unfold Odd at *
+  obtain ⟨k, hk⟩ := hn
+  obtain ⟨l, hl⟩ := hm
+  rw [hk, hl]
+  use k + l + 2 * k * l
+  ring
+
+end Demo

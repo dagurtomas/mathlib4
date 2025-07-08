@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2023 Dagur Asgeirsson. All rights reserved.
+Copyright (c) 2025 Dagur Asgeirsson. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Dagur Asgeirsson
 -/
@@ -7,16 +7,10 @@ import Mathlib.CategoryTheory.Limits.Shapes.Countable
 import Mathlib.Topology.Category.CompHaus.Basic
 /-!
 
-# Light profinite spaces
+# Light compact Hausdorff spaces
 
-We construct the category `LightCompHaus` of light profinite topological spaces. These are
-implemented as totally disconnected second countable compact Hausdorff spaces.
-
-This file also defines the category `LightDiagram`, which consists of those spaces that can be
-written as a sequential limit (in `Profinite`) of finite sets.
-
-We define an equivalence of categories `LightCompHaus ≌ LightDiagram` and prove that these are
-essentially small categories.
+We construct the category `LightCompHaus` of light compact Hausdorff spaces. These are
+implemented as second countable compact Hausdorff spaces.
 
 ## Implementation
 
@@ -24,9 +18,6 @@ The category `LightCompHaus` is defined using the structure `CompHausLike`. See 
 `CompHausLike.Basic` for more information.
 
 -/
-
-/- The basic API for `LightCompHaus` is largely copied from the API of `Profinite`;
-where possible, try to keep them in sync -/
 
 universe v u
 
@@ -44,7 +35,7 @@ instance (X : Type*) [TopologicalSpace X]
 
 /--
 Construct a term of `LightCompHaus` from a type endowed with the structure of a compact,
-Hausdorff, totally disconnected and second countable topological space.
+Hausdorff and second countable topological space.
 -/
 abbrev of (X : Type*) [TopologicalSpace X] [CompactSpace X] [T2Space X]
     [SecondCountableTopology X] : LightCompHaus :=
@@ -58,7 +49,7 @@ instance {X : LightCompHaus} : SecondCountableTopology X :=
 
 end LightCompHaus
 
-/-- The fully faithful embedding of `LightCompHaus` in `Profinite`. -/
+/-- The fully faithful embedding of `LightCompHaus` in `CompHaus`. -/
 abbrev lightToCompHaus : LightCompHaus ⥤ CompHaus :=
   compHausLikeToCompHaus _
 
@@ -109,22 +100,18 @@ noncomputable instance createsCountableLimits {J : Type v} [SmallCategory J] [Co
 instance : HasCountableLimits LightCompHaus where
   out _ := { has_limit := fun F ↦ ⟨limitCone F, limitConeIsLimit F⟩ }
 
--- instance : PreservesLimitsOfShape ℕᵒᵖ (forget LightCompHaus.{u}) :=
---   have : PreservesLimitsOfSize.{0, 0} (forget CompHaus.{u}) := preservesLimitsOfSize_shrink _
---   inferInstanceAs (PreservesLimitsOfShape ℕᵒᵖ (lightToCompHaus ⋙ forget CompHaus))
-
 variable {X Y : LightCompHaus.{u}} (f : X ⟶ Y)
 
-/-- Any morphism of light profinite spaces is a closed map. -/
+/-- Any morphism of light compact Hausdorff spaces is a closed map. -/
 theorem isClosedMap : IsClosedMap f :=
   CompHausLike.isClosedMap _
 
-/-- Any continuous bijection of light profinite spaces induces an isomorphism. -/
+/-- Any continuous bijection of light compact Hausdorff spaces induces an isomorphism. -/
 theorem isIso_of_bijective (bij : Function.Bijective f) : IsIso f :=
   haveI := CompHausLike.isIso_of_bijective (lightToCompHaus.map f) bij
   isIso_of_fully_faithful lightToCompHaus _
 
-/-- Any continuous bijection of light profinite spaces induces an isomorphism. -/
+/-- Any continuous bijection of light compact Hausdorff spaces induces an isomorphism. -/
 noncomputable def isoOfBijective (bij : Function.Bijective f) : X ≅ Y :=
   letI := LightCompHaus.isIso_of_bijective f bij
   asIso f

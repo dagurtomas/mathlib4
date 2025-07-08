@@ -1,10 +1,11 @@
 /-
-Copyright (c) 2024 Dagur Asgeirsson. All rights reserved.
+Copyright (c) 2025 Dagur Asgeirsson. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Dagur Asgeirsson
 -/
 import Mathlib.Topology.Category.CompHausLike.Limits
-import Mathlib.Topology.Category.LightCompHaus.Basic
+import Mathlib.Topology.Category.CompHaus.Basic
+-- import Mathlib.Topology.Category.LightCompHaus.Basic
 /-!
 
 # Explicit limits and colimits
@@ -14,9 +15,50 @@ the file `Mathlib/Topology/Category/CompHausLike/Limits.lean`) to the special ca
 `LightCompHaus`.
 -/
 
+universe u w
+
+open CategoryTheory Limits Opposite Topology TopologicalSpace CompHausLike
+
+/-- `LightCompHaus` is the category of second countable compact Hausdorff spaces. -/
+abbrev LightCompHaus := CompHausLike
+  (fun X ↦ SecondCountableTopology X)
+
 namespace LightCompHaus
 
-universe u w
+instance (X : Type*) [TopologicalSpace X]
+    [SecondCountableTopology X] : HasProp (fun Y ↦ SecondCountableTopology Y) X :=
+  ⟨(inferInstanceAs (SecondCountableTopology X))⟩
+
+/--
+Construct a term of `LightCompHaus` from a type endowed with the structure of a compact,
+Hausdorff and second countable topological space.
+-/
+abbrev of (X : Type*) [TopologicalSpace X] [CompactSpace X] [T2Space X]
+    [SecondCountableTopology X] : LightCompHaus :=
+  CompHausLike.of _ X
+
+instance : Inhabited LightCompHaus :=
+  ⟨LightCompHaus.of PEmpty⟩
+
+instance {X : LightCompHaus} : SecondCountableTopology X :=
+  X.prop
+
+end LightCompHaus
+
+/-- The fully faithful embedding of `LightCompHaus` in `CompHaus`. -/
+abbrev lightToCompHaus : LightCompHaus ⥤ CompHaus :=
+  compHausLikeToCompHaus _
+
+/-- `lightToCompHaus` is fully faithful. -/
+abbrev lightToCompHausFullyFaithful : lightToCompHaus.FullyFaithful :=
+  fullyFaithfulToCompHausLike _
+
+/-- The fully faithful embedding of `LightCompHaus` in `TopCat`.
+This is definitionally the same as the obvious composite. -/
+abbrev LightCompHaus.toTopCat : LightCompHaus ⥤ TopCat :=
+  CompHausLike.compHausLikeToTop _
+
+namespace LightCompHaus
 
 open CategoryTheory Limits CompHausLike
 
