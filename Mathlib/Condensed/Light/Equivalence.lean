@@ -22,7 +22,8 @@ namespace LightCompHaus
 
 /--
 This is a technical declaration saying that a topological space is second countable, in a
-slightly weird way to make it work with the `CompHausLike` API.
+slightly weird way to make it work with the "API" used for categories of compact Hausdorff spaces
+satisfying additional hypotheses (`CompHausLike`).
 -/
 instance (X : Type*) [TopologicalSpace X] [SecondCountableTopology X] :
     HasProp (fun Y ↦ SecondCountableTopology Y) X :=
@@ -171,9 +172,9 @@ noncomputable def lightProfiniteToLightCompHausEffectivePresentation (X : LightC
     exact (hausdorff_alexandroff X).choose_spec.2
 
 /--
-The functor from `LightProfinite` to `LightCompHaus` satisfies the condition in the general theorem
-about equivalence of sheaf categories about every object admitting an effective epimorphism from
-objects in the source.
+The functor from `LightProfinite` to `LightCompHaus` satisfies the condition (*) in the general
+theorem about equivalence of sheaf categories about every object admitting an effective epimorphism
+from objects in the source.
 -/
 instance : lightProfiniteToLightCompHaus.{0}.EffectivelyEnough where
   presentation X := ⟨lightProfiniteToLightCompHausEffectivePresentation X⟩
