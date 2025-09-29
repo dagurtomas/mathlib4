@@ -35,7 +35,33 @@ variable {J : GrothendieckTopology C}
 
 attribute [local instance] Types.instConcreteCategory
 
-instance (U : C) [J.IsFinitelyCovered U] :
+@[simps]
+def pointwiseCocone {A I : Type*} [Category A] [Category I] {K : I ⥤ Sheaf J A}
+    (c : Cocone (K ⋙ sheafToPresheaf J A)) (hcpt : Presheaf.IsSheaf J c.pt) : Cocone K where
+  pt := ⟨c.pt, hcpt⟩
+  ι := {
+    app X := ⟨c.ι.app X⟩
+    naturality _ _ f := by
+      ext1
+      simpa using c.ι.naturality f }
+
+def pointwiseCoconeIsColimit {A I : Type*} [Category A] [Category I] {K : I ⥤ Sheaf J A}
+    (c : Cocone (K ⋙ sheafToPresheaf J A)) (hcpt : Presheaf.IsSheaf J c.pt) (hc : IsColimit c) :
+    IsColimit (pointwiseCocone c hcpt) where
+  desc s := ⟨hc.desc ((sheafToPresheaf _ _).mapCocone s)⟩
+  uniq s m h := by
+    ext1
+    apply hc.uniq ((sheafToPresheaf _ _).mapCocone s)
+    intro i
+    simpa using Sheaf.hom_ext_iff.mp (h i)
+
+def isSheafColimitOfFinitary {I : Type*} [Category I] [IsFiltered I]
+    {K : I ⥤ Sheaf J (Type max u v)} (c : Cocone (K ⋙ sheafToPresheaf _ _)) (hc : IsColimit c)
+    {X : C} (R : Presieve X) (hR : R.uncurry.Finite) :
+    Presieve.IsSheafFor c.pt R := by
+  sorry
+
+instance [J.IsFinitary] (U : C) :
     PreservesFilteredColimits ((sheafSections J (Type max u v)).obj ⟨U⟩) where
   preserves_filtered_colimits I := { preservesColimit {K} := { preserves {c} hc := sorry } }
 
