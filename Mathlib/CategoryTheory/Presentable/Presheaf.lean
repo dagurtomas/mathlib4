@@ -29,7 +29,11 @@ class IsFinitelyCovered (J : GrothendieckTopology C) (X : C) : Prop where
   exists_finite (S : Sieve X) (_ : S ∈ J X) :
     ∃ (P : Presieve X), P.uncurry.Finite ∧ .generate P ∈ J X ∧ P ≤ S
 
-abbrev IsFinitary (J : GrothendieckTopology C) := ∀ X, J.IsFinitelyCovered X
+-- abbrev IsFinitary (J : GrothendieckTopology C) := ∀ X, J.IsFinitelyCovered X
+
+class IsFinitary (J : GrothendieckTopology C) : Prop where
+  exists_finite : ∃ K : Coverage C, (∀ X : C, ∀ P, P ∈ K X → P.uncurry.Finite) ∧
+    K.toGrothendieck = J
 
 variable {J : GrothendieckTopology C}
 
@@ -55,11 +59,20 @@ def pointwiseCoconeIsColimit {A I : Type*} [Category A] [Category I] {K : I ⥤ 
     intro i
     simpa using Sheaf.hom_ext_iff.mp (h i)
 
-def isSheafColimitOfFinitary {I : Type*} [Category I] [IsFiltered I]
+lemma isSheafFor_colimit_of_finite {I : Type*} [Category I] [IsFiltered I]
     {K : I ⥤ Sheaf J (Type max u v)} (c : Cocone (K ⋙ sheafToPresheaf _ _)) (hc : IsColimit c)
     {X : C} (R : Presieve X) (hR : R.uncurry.Finite) :
     Presieve.IsSheafFor c.pt R := by
   sorry
+
+lemma isSheaf_colimit_of_finitary {I : Type*} [Category I] [IsFiltered I] [J.IsFinitary]
+    {K : I ⥤ Sheaf J (Type max u v)} (c : Cocone (K ⋙ sheafToPresheaf _ _)) (hc : IsColimit c) :
+    Presieve.IsSheaf J c.pt := by
+  obtain ⟨L, h, rfl⟩ := IsFinitary.exists_finite (J := J)
+  rw [Presieve.isSheaf_coverage]
+  intro X R hR
+  apply isSheafFor_colimit_of_finite c hc
+  grind
 
 instance [J.IsFinitary] (U : C) :
     PreservesFilteredColimits ((sheafSections J (Type max u v)).obj ⟨U⟩) where
