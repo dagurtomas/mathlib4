@@ -1,6 +1,7 @@
 import Std
 import Batteries
 import Mathlib.AdicSpace.AdicSpace
+import Mathlib.AdicSpace.Analytification
 import Mathlib.AdicSpace.HuberPair
 import Mathlib.AdicSpace.Spa.RationalOpenData
 import Mathlib.AdicSpace.Spa.StalkValuation
