@@ -327,9 +327,19 @@ instance : (zariskiPrecoverage C).HasPullbacks := by
   have : IsOpenImmersion h := hR.2 hh
   infer_instance
 
+instance {X : C}
+    (𝒰 : Precoverage.ZeroHypercover (zariskiPrecoverage C) X) (i) :
+    IsOpenImmersion (𝒰.f i) :=
+  sorry
+
 variable (C) in
 def zariskiTopology : GrothendieckTopology C :=
   (zariskiPrecoverage C).toGrothendieck
+
+instance {X : C}
+    (𝒰 : (zariskiTopology C).OneHypercover X) (i) :
+    IsOpenImmersion (𝒰.f i) :=
+  sorry
 
 end Topological
 
@@ -389,6 +399,12 @@ noncomputable def relativePullback.snd {U X : C} {Y : D} (f : U ⟶ X) [IsOpenIm
     (g : R.obj Y ⟶ L.obj X) : relativePullback f g ⟶ Y :=
   (R.opensEquiv Y).symm ((L.opensEquiv X (IsOpenImmersion.opensRange f)).preimage g) |>.ι
 
+instance {U X : C} {Y : D} (f : U ⟶ X) [IsOpenImmersion f]
+    (g : R.obj Y ⟶ L.obj X) :
+    IsOpenImmersion (relativePullback.snd f g) := by
+  dsimp only [relativePullback.snd]
+  infer_instance
+
 noncomputable def relativePullback.fst {U X : C} {Y : D} (f : U ⟶ X) [IsOpenImmersion f]
     (g : R.obj Y ⟶ L.obj X) : R.obj (relativePullback f g) ⟶ L.obj U :=
   IsOpenImmersion.lift (R.map (relativePullback.snd f g) ≫ g) (L.map f) sorry
@@ -425,6 +441,32 @@ lemma relativePullback.hom_ext {U X : C} {Y : D} {f : U ⟶ X} [IsOpenImmersion 
     u = v :=
   sorry
 
+
+noncomputable
+nonrec def CategoryTheory.Precoverage.ZeroHypercover.relativePullback
+    {X : C} {Y : D} (𝒰 : (zariskiPrecoverage C).ZeroHypercover X)
+    (f : R.obj Y ⟶ L.obj X) :
+    (zariskiPrecoverage D).ZeroHypercover Y where
+  I₀ := 𝒰.I₀
+  X i := relativePullback (𝒰.f i) f
+  f i := relativePullback.snd _ _
+  mem₀ := by
+    refine ⟨?_, ?_⟩
+    · simp only [Precoverage.mem_comap_iff, Presieve.map_ofArrows,
+        Types.ofArrows_mem_jointlySurjectivePrecoverage_iff, Set.mem_range]
+      intro y
+      dsimp [Topological.forget] at y
+      -- let x := toTopCat.map f y
+      sorry
+    · simp only [MorphismProperty.ofArrows_mem_precoverage]
+      intro i
+      infer_instance
+
 end Functor
+
+namespace Topological
+
+
+end Topological
 
 end CategoryTheory
