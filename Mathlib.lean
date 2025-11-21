@@ -2,11 +2,14 @@ import Std
 import Batteries
 import Mathlib.AdicSpace.AdicSpace
 import Mathlib.AdicSpace.Analytification
+import Mathlib.AdicSpace.Analytification2
+import Mathlib.AdicSpace.FunctorTopology
 import Mathlib.AdicSpace.HuberPair
 import Mathlib.AdicSpace.Spa.RationalOpenData
 import Mathlib.AdicSpace.Spa.StalkValuation
 import Mathlib.AdicSpace.Spa.StructurePresheaf
 import Mathlib.AdicSpace.Spv
+import Mathlib.AdicSpace.TopologicalFunctor
 import Mathlib.Algebra.AddConstMap.Basic
 import Mathlib.Algebra.AddConstMap.Equiv
 import Mathlib.Algebra.AddTorsor.Basic
@@ -2779,6 +2782,7 @@ import Mathlib.CategoryTheory.Products.Unitor
 import Mathlib.CategoryTheory.Quotient
 import Mathlib.CategoryTheory.Quotient.Linear
 import Mathlib.CategoryTheory.Quotient.Preadditive
+import Mathlib.CategoryTheory.RepresentedBy
 import Mathlib.CategoryTheory.Retract
 import Mathlib.CategoryTheory.Shift.Adjunction
 import Mathlib.CategoryTheory.Shift.Basic

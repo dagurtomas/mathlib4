@@ -1,5 +1,6 @@
 import Mathlib.AdicSpace.TopologicalFunctor
 import Mathlib.CategoryTheory.Sites.Canonical
+import Mathlib.CategoryTheory.RepresentedBy
 
 universe w' w v' u' v₃ u₃ v₂ u₂ v₁ u₁ v u
 
@@ -11,11 +12,27 @@ namespace Functor
 
 variable {C : Type u} [Category.{v} C]
 
+section General
+
+end General
+
+variable {C : Type u} [Category.{v} C]
+
 instance {F : Cᵒᵖ ⥤ Type w} [F.IsRepresentable] (X : Cᵒᵖ) : Small.{v} (F.obj X) :=
   (small_congr F.representableBy.homEquiv).mp inferInstance
 
-variable {C D E : Type*} [Category C] [Category D] [Category E]
+end Functor
 
+variable {C : Type u} [Category.{v} C]
+
+  --homEquiv {Y} :=
+  --  { toFun f := F.map f.op x
+  --    invFun y := sorry
+  --    left_inv := sorry
+  --    right_inv := sorry }
+  --homEquiv_comp := by simp
+
+variable {C D E : Type*} [Category C] [Category D] [Category E] in
 instance {J : Type*} [Category J]
     (F : J ⥤ C ⥤ D) (K : D ⥤ E) [HasLimitsOfShape J D]
     [∀ X, PreservesLimit (F ⋙ (evaluation C D).obj X) K] :
@@ -23,39 +40,8 @@ instance {J : Type*} [Category J]
   apply CategoryTheory.Limits.preservesLimit_of_evaluation
   intro X
   dsimp
-  have : PreservesLimit F ((evaluation C D).obj X) :=
-    inferInstance
   apply comp_preservesLimit
 
-end Functor
-
-variable {C : Type u} [Category.{v} C]
-
-def Functor.representableByUliftFunctorEquiv {F : Cᵒᵖ ⥤ Type w} {X : C} :
-    (F ⋙ uliftFunctor.{w'}).RepresentableBy X ≃ F.RepresentableBy X where
-  toFun R :=
-    { homEquiv {Y} := R.homEquiv.trans Equiv.ulift
-      homEquiv_comp f g := congr($(R.homEquiv_comp _ _).down) }
-  invFun R :=
-    { homEquiv {Y} := R.homEquiv.trans Equiv.ulift.symm
-      homEquiv_comp f g := by simp [R.homEquiv_comp] }
-
-@[simps]
-def Functor.RepresentableBy.equivULiftYoneda (F : Cᵒᵖ ⥤ Type (max w v)) (X : C) :
-    F.RepresentableBy X ≃ (uliftYoneda.obj X ≅ F) where
-  toFun R := NatIso.ofComponents (fun X ↦ equivEquivIso (Equiv.ulift.trans R.homEquiv)) <| by
-    intro X Y f
-    ext x
-    exact R.homEquiv_comp f.unop _
-  invFun e :=
-    { homEquiv {X} := Equiv.ulift.symm.trans (equivEquivIso.symm (e.app _))
-      homEquiv_comp {X Y} f g := congr($(e.hom.naturality f.op) ⟨g⟩) }
-
-lemma Functor.isRepresentable_comp_uliftFunctor_iff {F : Cᵒᵖ ⥤ Type w} :
-    (F ⋙ uliftFunctor.{w'}).IsRepresentable ↔ F.IsRepresentable := by
-  refine ⟨fun ⟨X, ⟨R⟩⟩ ↦ ?_, fun ⟨X, ⟨R⟩⟩ ↦ ?_⟩
-  · exact ⟨X, ⟨representableByUliftFunctorEquiv R⟩⟩
-  · exact ⟨X, ⟨representableByUliftFunctorEquiv.symm R⟩⟩
 
 --noncomputable def foo
 --    {J : Type*} [Category J] {F : J ⥤ Cᵒᵖ ⥤ Type w}
@@ -125,7 +111,7 @@ lemma essImage_uliftYoneda :
     (uliftYoneda.{w} (C := C)).essImage = isRepresentable.{max w v} C := by
   ext F
   exact ⟨fun ⟨X, ⟨e⟩⟩ ↦ .of_natIso e,
-    fun ⟨X, ⟨e⟩⟩ ↦ ⟨X, ⟨(Functor.RepresentableBy.equivULiftYoneda _ _) e⟩⟩⟩
+    fun ⟨X, ⟨e⟩⟩ ↦ ⟨X, ⟨(Functor.RepresentableBy.equivUliftYoneda _ _) e⟩⟩⟩
 
 variable (C) in
 @[simps! -isSimp]
@@ -155,7 +141,7 @@ private lemma Functor.RepresentableBy.ofIsLimitAux' {J : Type*} [Category J]
   let e : F'' ⋙ CategoryTheory.uliftYoneda.{w} ≅ F :=
     (Functor.associator _ _ _) ≪≫ Functor.isoWhiskerLeft _
       (yonedaEquivIsRepresentableCompUliftYonedaIso C)
-  exact (Functor.RepresentableBy.equivULiftYoneda _ _).symm <|
+  exact (Functor.RepresentableBy.equivUliftYoneda _ _).symm <|
     (preservesLimitIso CategoryTheory.uliftYoneda.{w, v, u} F'') ≪≫
       (limit.isLimit _).conePointsIsoOfNatIso hc e
 
@@ -171,7 +157,7 @@ private lemma Functor.RepresentableBy.ofIsLimitAux {J : Type*} [Category J]
   let e : F'' ⋙ CategoryTheory.uliftYoneda.{w} ≅ F :=
     (Functor.associator _ _ _) ≪≫ Functor.isoWhiskerLeft _
       (yonedaEquivIsRepresentableCompUliftYonedaIso C)
-  exact (Functor.RepresentableBy.equivULiftYoneda _ _).symm <|
+  exact (Functor.RepresentableBy.equivUliftYoneda _ _).symm <|
     (preservesLimitIso CategoryTheory.uliftYoneda.{w, v, u} F'') ≪≫
       (limit.isLimit _).conePointsIsoOfNatIso hc e
 
@@ -295,6 +281,56 @@ def universalProperty : C ⥤ Dᵒᵖ ⥤ Type v₃ :=
 
 abbrev HasAnalytification (X : C) : Prop :=
   (universalProperty L R |>.obj X).IsRepresentable
+
+abbrev IsAnalytification {X : C} {Y : D} (f : R.obj Y ⟶ L.obj X) : Prop :=
+  (universalProperty L R |>.obj X).IsRepresentedBy f
+
+lemma hasAnalytification_iff_exists_isAnalytification {X : C} :
+    HasAnalytification L R X ↔
+      ∃ (Y : D) (f : R.obj Y ⟶ L.obj X), IsAnalytification L R f :=
+  Functor.IsRepresentable.iff_exists_isRepresentedBy
+
+--def equivRepresentableBy (X : C) (Y : D) :
+--    (universalProperty L R |>.obj X).RepresentableBy Y ≃ _ :=
+--  sorry
+
+lemma isLimit_iff_isAnalytification_id_overMap
+    {X Y Z : C} (f : X ⟶ Z) (g : Y ⟶ Z) (c : PullbackCone f g) :
+    Nonempty (IsLimit c) ↔
+      IsAnalytification (𝟭 _) (Over.map g) (X := Over.mk f) (Y := Over.mk c.snd)
+        (Over.homMk c.fst c.condition) := by
+  refine ⟨fun ⟨hc⟩ ↦ ?_, fun h ↦ ⟨⟨?_, ?_, ?_⟩⟩⟩
+  · rw [IsAnalytification, Functor.isRepresentedBy_iff]
+    intro W
+    refine ⟨?_, ?_⟩
+    · intro u v huv
+      dsimp at huv
+      ext
+      apply PullbackCone.IsLimit.hom_ext hc
+      · exact congr($(huv).left)
+      · exact (Over.w u).trans (Over.w v).symm
+    · intro u
+      dsimp at u
+      refine ⟨Over.homMk ?_ ?_, ?_⟩
+      · exact PullbackCone.IsLimit.lift hc u.left W.hom (Over.w u)
+      · simp
+      · cat_disch
+  · sorry
+  · sorry
+  · sorry
+
+lemma hasPullback_iff_hasAnalytification {X Y Z : C} (f : X ⟶ Z) (g : Y ⟶ Z) :
+    HasPullback f g ↔ HasAnalytification (𝟭 _) (Over.map g) (Over.mk f) := by
+  refine ⟨fun h ↦ ?_, ?_⟩
+  · refine ⟨Over.mk (pullback.snd f g), ⟨⟨?_, ?_⟩⟩⟩
+    · intro W
+      dsimp
+      sorry
+    · sorry
+  · sorry
+
+abbrev HasRelativePullback {U X : C} {Y : D} (f : U ⟶ X) (g : R.obj Y ⟶ L.obj X) : Prop :=
+  HasAnalytification (Over.post L) (Over.post R ⋙ Over.map g) (Over.mk f)
 
 noncomputable
 def analytification [∀ X, HasAnalytification L R X] : C ⥤ D where
