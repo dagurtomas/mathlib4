@@ -188,7 +188,7 @@ instance : IsIso (Subpresheaf.ι (⊤ : Subpresheaf F)) := by
   rw [isIso_iff_bijective]
   exact ⟨Subtype.coe_injective, fun x => ⟨⟨x, _root_.trivial⟩, rfl⟩⟩
 
-attribute [local instance] Types.instFunLike Types.instConcreteCategory in
+attribute [local instance] Types.instConcreteCategory in
 theorem eq_top_iff_isIso : G = ⊤ ↔ IsIso G.ι := by
   constructor
   · rintro rfl

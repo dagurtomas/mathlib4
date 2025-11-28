@@ -37,7 +37,7 @@ namespace CategoryTheory.coherentTopology
 
 variable {C : Type u} [Category.{v} C] [Preregular C] [FinitaryExtensive C]
 
-attribute [local instance] Types.instFunLike Types.instConcreteCategory
+attribute [local instance] Types.instConcreteCategory
 variable {F : ℕᵒᵖ ⥤ Sheaf (coherentTopology C) (Type v)} {c : Cone F}
     (hc : IsLimit c)
     (hF : ∀ n, Sheaf.IsLocallySurjective (F.map (homOfLE (Nat.le_succ n)).op))

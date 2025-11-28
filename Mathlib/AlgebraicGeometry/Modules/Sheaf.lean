@@ -29,11 +29,11 @@ variable (X : Scheme.{u})
 /-- The category of sheaves of modules over a scheme. -/
 abbrev Modules := SheafOfModules.{u} X.ringCatSheaf
 
-attribute [local instance] Types.instFunLike Types.instConcreteCategory in
+attribute [local instance] Types.instConcreteCategory in
 noncomputable instance : HasSheafify (Opens.grothendieckTopology X) AddCommGrpCat.{u} :=
   inferInstance
 
-attribute [local instance] Types.instFunLike Types.instConcreteCategory in
+attribute [local instance] Types.instConcreteCategory in
 noncomputable instance : Abelian X.Modules := inferInstance
 
 end AlgebraicGeometry.Scheme

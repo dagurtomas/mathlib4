@@ -40,7 +40,7 @@ Since instance synthesis only looks through reducible definitions, we need to he
 over the instances that wouldn't be found otherwise.
 -/
 
-attribute [local instance] Types.instFunLike Types.instConcreteCategory
+attribute [local instance] Types.instConcreteCategory
 
 instance : (@forget (Type u) _ ConcreteCategory.toHasForget).Full :=
   Functor.Full.id

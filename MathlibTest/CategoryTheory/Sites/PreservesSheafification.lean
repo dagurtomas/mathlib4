@@ -7,7 +7,7 @@ universe u
 
 open CategoryTheory GrothendieckTopology
 
-attribute [local instance] Types.instFunLike Types.instConcreteCategory
+attribute [local instance] Types.instConcreteCategory
 
 section Small
 

@@ -424,6 +424,7 @@ This is not an instance (yet) because that would require a lot of downstream fix
 
 See note [reducible non-instances].
 -/
+@[deprecated "No replacement" (since := "2025-11-28")]
 abbrev Types.instFunLike : ∀ X Y : Type u, FunLike (X ⟶ Y) X Y := HasForget.toFunLike _
 
 /-- The category of types is concrete, using the identity functor.
