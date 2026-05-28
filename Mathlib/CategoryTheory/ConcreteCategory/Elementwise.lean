@@ -19,7 +19,9 @@ public section
 open CategoryTheory CategoryTheory.Limits
 
 attribute [elementwise] limit.lift_π limit.w
-  colimit.ι_desc colimit.w kernel.lift_ι cokernel.π_desc kernel.condition cokernel.condition
+  colimit.ι_desc colimit.w IsColimit.fac kernel.lift_ι cokernel.π_desc kernel.condition
+  cokernel.condition
 
 attribute [simp] limit.lift_π_apply limit.w_apply colimit.ι_desc_apply colimit.w_apply
-  kernel.lift_ι_apply cokernel.π_desc_apply kernel.condition_apply cokernel.condition_apply
+  IsColimit.fac_apply kernel.lift_ι_apply cokernel.π_desc_apply kernel.condition_apply
+  cokernel.condition_apply
