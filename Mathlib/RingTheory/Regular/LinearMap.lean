@@ -43,16 +43,6 @@ lemma linearMap_subsingleton_of_mem_annihilator {r : R} (reg : IsSMulRegular M r
     rw [smul_zero, ← map_smul, Module.mem_annihilator.mp mem_ann x, map_zero]
   simpa using reg this
 
-lemma exists_associatedPrime_of_forall_mem_annihilator_not_isSMulRegular [IsNoetherianRing R]
-    [Module.Finite R M] [Module.Finite R N] [Nontrivial M]
-    (h : ∀ r ∈ Module.annihilator R N, ¬ IsSMulRegular M r) :
-    ∃ p ∈ associatedPrimes R M, Module.annihilator R N ≤ p := by
-  rcases associatedPrimes.nonempty R M with ⟨Ia, hIa⟩
-  apply (Ideal.subset_union_prime_finite (associatedPrimes.finite R M) Ia Ia _).mp
-  · rw [biUnion_associatedPrimes_eq_compl_regular R M]
-    exact fun r hr ↦ h r hr
-  · exact fun I hin _ _ ↦ IsAssociatedPrime.isPrime hin
-
 lemma subsingleton_linearMap_iff [IsNoetherianRing R] [Module.Finite R M] [Module.Finite R N] :
     Subsingleton (N →ₗ[R] M) ↔ ∃ r ∈ Module.annihilator R N, IsSMulRegular M r := by
   refine ⟨fun hom0 ↦ ?_, fun ⟨r, mem_ann, reg⟩ ↦
@@ -60,8 +50,12 @@ lemma subsingleton_linearMap_iff [IsNoetherianRing R] [Module.Finite R M] [Modul
   cases subsingleton_or_nontrivial M
   · exact ⟨0, ⟨Submodule.zero_mem (Module.annihilator R N), IsSMulRegular.zero⟩⟩
   · by_contra! h
-    obtain ⟨p, pass, hp⟩ :=
-      exists_associatedPrime_of_forall_mem_annihilator_not_isSMulRegular (M := M) (N := N) h
+    obtain ⟨p, pass, hp⟩ : ∃ p ∈ associatedPrimes R M, Module.annihilator R N ≤ p := by
+      rcases associatedPrimes.nonempty R M with ⟨Ia, hIa⟩
+      apply (Ideal.subset_union_prime_finite (associatedPrimes.finite R M) Ia Ia _).mp
+      · rw [biUnion_associatedPrimes_eq_compl_regular R M]
+        exact fun r hr ↦ h r hr
+      · exact fun I hin _ _ ↦ IsAssociatedPrime.isPrime hin
     have := pass.isPrime
     let p' : PrimeSpectrum R := ⟨p, pass.isPrime⟩
     have loc_ne_zero : p' ∈ Module.support R N := Module.mem_support_iff_of_finite.mpr hp
