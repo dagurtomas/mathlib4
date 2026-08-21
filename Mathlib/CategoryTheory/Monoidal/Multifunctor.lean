@@ -9,15 +9,17 @@ public import Mathlib.CategoryTheory.Functor.CurryingFour
 public import Mathlib.CategoryTheory.Monoidal.Functor
 /-!
 
-# Constructing monoidal functors from natural transformations between multifunctors
+# Constructing monoidal categories and monoidal functors from multifunctors
 
-This file provides alternative constructors for (op/lax) monoidal functors, given tensorators
-`μ : F - ⊗ F - ⟶  F (- ⊗ -)` / `δ : F (- ⊗ -) ⟶ F - ⊗ F -` as natural transformations between
-bifunctors. The associativity conditions are phrased as equalities of natural transformations
-between trifunctors `(F - ⊗ F -) ⊗ F - ⟶ F (- ⊗ (- ⊗ -))` / `F ((- ⊗ -) ⊗ -) ⟶ F - ⊗ (F - ⊗ F -)`,
-and the unitality conditions are phrased as equalities of natural transformation between functors.
-We also construct monoidal category structures from pentagon and triangle identities expressed as
-equalities of natural transformations between quadrifunctors and bifunctors.
+This file first constructs monoidal category structures from a tensor bifunctor, associator and
+unitor natural isomorphisms, and pentagon and triangle identities expressed as equalities of
+natural transformations between quadrifunctors and bifunctors.
+
+It then provides alternative constructors for (op/lax) monoidal functors, given tensorators
+`μ : F - ⊗ F - ⟶ F (- ⊗ -)` / `δ : F (- ⊗ -) ⟶ F - ⊗ F -` as natural transformations between
+bifunctors. The associativity conditions are equalities of natural transformations between
+trifunctors `(F - ⊗ F -) ⊗ F - ⟶ F (- ⊗ (- ⊗ -))` / `F ((- ⊗ -) ⊗ -) ⟶ F - ⊗ (F - ⊗ F -)`,
+and the unitality conditions are equalities of natural transformations between functors.
 -/
 
 @[expose] public section
@@ -42,13 +44,24 @@ abbrev source : C ⥤ C ⥤ C ⥤ C ⥤ C :=
 abbrev target : C ⥤ C ⥤ C ⥤ C ⥤ C :=
   trifunctorComp₂₃₄ tensor (bifunctorComp₂₃ tensor tensor)
 
-/-- The three-associator path around the monoidal pentagon. -/
+/-- The three-associator path along the top and right of the monoidal pentagon.
+
+```
+((X₁ ⊗ X₂) ⊗ X₃) ⊗ X₄  ---->  (X₁ ⊗ (X₂ ⊗ X₃)) ⊗ X₄
+              |                              |
+              v                              v
+   (X₁ ⊗ X₂) ⊗ (X₃ ⊗ X₄)       X₁ ⊗ ((X₂ ⊗ X₃) ⊗ X₄)
+              \                              |
+               \                             v
+                ------> X₁ ⊗ (X₂ ⊗ (X₃ ⊗ X₄))
+```
+-/
 def firstMap
     (associator : bifunctorComp₁₂ tensor tensor ≅ bifunctorComp₂₃ tensor tensor) :
     source tensor ⟶ target tensor :=
   (Functor.postcompose₃.obj tensor).map associator.hom ≫
     (bifunctorComp₂₃Functor.map associator.hom).app tensor ≫
-      (trifunctorComp₂₃₄Functor tensor).map associator.hom
+      (trifunctorComp₂₃₄Functor.obj tensor).map associator.hom
 
 set_option backward.isDefEq.respectTransparency false in
 @[simp]
@@ -60,12 +73,13 @@ lemma firstMap_app_app_app_app
         (((associator.hom.app X₁).app ((tensor.obj X₂).obj X₃)).app X₄) ≫
           (tensor.obj X₁).map (((associator.hom.app X₂).app X₃).app X₄) := rfl
 
-/-- The two-associator path around the monoidal pentagon. -/
+/-- The two-associator path along the left and bottom of the monoidal pentagon displayed in
+`Pentagon.firstMap`. -/
 def secondMap
     (associator : bifunctorComp₁₂ tensor tensor ≅ bifunctorComp₂₃ tensor tensor) :
     source tensor ⟶ target tensor :=
   (bifunctorComp₁₂Functor.obj tensor).map associator.hom ≫
-    (trifunctorComp₃₄Functor tensor).map associator.hom
+    (trifunctorComp₃₄Functor.map associator.hom).app tensor
 
 set_option backward.isDefEq.respectTransparency false in
 @[simp]
@@ -115,14 +129,24 @@ def leftUnitorMap (unit : C) (leftUnitor : tensor.obj unit ≅ 𝟭 C) :
       (tensor.obj X).map (leftUnitor.hom.app Z) ≫ (tensor.map f).app Z
     exact ((tensor.map f).naturality (leftUnitor.hom.app Z)).symm
 
-/-- The path around the monoidal triangle through the associator and left unitor. -/
+/-- The path around the top and right of the monoidal triangle through the associator and left
+unitor.
+
+```
+(X₁ ⊗ 𝟙) ⊗ X₂  ---->  X₁ ⊗ (𝟙 ⊗ X₂)
+        \                       |
+         \                      v
+          ----------> X₁ ⊗ X₂
+```
+-/
 @[simps!]
 def firstMap (unit : C)
     (associator : bifunctorComp₁₂ tensor tensor ≅ bifunctorComp₂₃ tensor tensor)
     (leftUnitor : tensor.obj unit ≅ 𝟭 C) : source tensor unit ⟶ tensor :=
   associatorMap tensor unit associator ≫ leftUnitorMap tensor unit leftUnitor
 
-/-- The path around the monoidal triangle through the right unitor. -/
+/-- The diagonal path in the monoidal triangle displayed in `Triangle.firstMap`, given by the
+right unitor. -/
 @[simps!]
 def secondMap (unit : C) (rightUnitor : tensor.flip.obj unit ≅ 𝟭 C) :
     source tensor unit ⟶ tensor where

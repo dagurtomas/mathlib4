@@ -11,9 +11,9 @@ public import Mathlib.CategoryTheory.Localization.Trifunctor
 /-!
 # Lifting of quadrifunctors
 
-This file extends the lifting of functors along localizations to functors in four variables.
-The definitions reduce to the localization of the right-associated product category by currying
-and uncurrying.
+In this file, in the context of the localization of categories, we extend the notion of lifting
+of functors to the case of quadrifunctors. The definitions reduce to functors on the
+right-associated product category by currying and uncurrying.
 -/
 
 @[expose] public section
@@ -28,13 +28,14 @@ variable {C₁ C₂ C₃ C₄ D₁ D₂ D₃ D₄ E : Type*}
 
 namespace MorphismProperty
 
-/-- Classes of morphisms `Wᵢ : MorphismProperty Cᵢ` for `1 ≤ i ≤ 4` are inverted by
-`F : C₁ ⥤ C₂ ⥤ C₃ ⥤ C₄ ⥤ E` if `W₁.prod (W₂.prod (W₃.prod W₄))` is inverted by
-`uncurry₄.obj F`. -/
+/-- Classes of morphisms `W₁ : MorphismProperty C₁`, `W₂ : MorphismProperty C₂`,
+`W₃ : MorphismProperty C₃` and `W₄ : MorphismProperty C₄` are said to be inverted by
+`F : C₁ ⥤ C₂ ⥤ C₃ ⥤ C₄ ⥤ E` if `W₁.prod (W₂.prod (W₃.prod W₄))` is inverted by the functor
+`currying₄.functor.obj F : C₁ × C₂ × C₃ × C₄ ⥤ E`. -/
 def IsInvertedBy₄ (W₁ : MorphismProperty C₁) (W₂ : MorphismProperty C₂)
     (W₃ : MorphismProperty C₃) (W₄ : MorphismProperty C₄)
     (F : C₁ ⥤ C₂ ⥤ C₃ ⥤ C₄ ⥤ E) : Prop :=
-  (W₁.prod (W₂.prod (W₃.prod W₄))).IsInvertedBy (uncurry₄.obj F)
+  (W₁.prod (W₂.prod (W₃.prod W₄))).IsInvertedBy (currying₄.functor.obj F)
 
 end MorphismProperty
 
@@ -44,14 +45,16 @@ section
 
 variable (L₁ : C₁ ⥤ D₁) (L₂ : C₂ ⥤ D₂) (L₃ : C₃ ⥤ D₃) (L₄ : C₄ ⥤ D₄)
 
-/-- A quadrifunctor `F' : D₁ ⥤ D₂ ⥤ D₃ ⥤ D₄ ⥤ E` lifts
-`F : C₁ ⥤ C₂ ⥤ C₃ ⥤ C₄ ⥤ E` along `L₁`, `L₂`, `L₃`, and `L₄` if simultaneous
-precomposition of `F'` by these four functors is isomorphic to `F`. -/
+/-- Given functors `L₁ : C₁ ⥤ D₁`, `L₂ : C₂ ⥤ D₂`, `L₃ : C₃ ⥤ D₃`, `L₄ : C₄ ⥤ D₄`,
+morphism properties `W₁` on `C₁`, `W₂` on `C₂`, `W₃` on `C₃`, `W₄` on `C₄`, and functors
+`F : C₁ ⥤ C₂ ⥤ C₃ ⥤ C₄ ⥤ E` and `F' : D₁ ⥤ D₂ ⥤ D₃ ⥤ D₄ ⥤ E`, we say
+`Lifting₄ L₁ L₂ L₃ L₄ W₁ W₂ W₃ W₄ F F'` holds if `F` is induced by `F'`, up to an
+isomorphism. -/
 class Lifting₄ (L₁ : C₁ ⥤ D₁) (L₂ : C₂ ⥤ D₂) (L₃ : C₃ ⥤ D₃) (L₄ : C₄ ⥤ D₄)
     (W₁ : MorphismProperty C₁) (W₂ : MorphismProperty C₂) (W₃ : MorphismProperty C₃)
     (W₄ : MorphismProperty C₄) (F : C₁ ⥤ C₂ ⥤ C₃ ⥤ C₄ ⥤ E)
     (F' : D₁ ⥤ D₂ ⥤ D₃ ⥤ D₄ ⥤ E) where
-  /-- The isomorphism expressing that `F'` lifts `F`. -/
+  /-- The isomorphism expressing that `F` is induced by `F'`, up to an isomorphism. -/
   iso (L₁ L₂ L₃ L₄ W₁ W₂ W₃ W₄ F F') :
     (((((whiskeringLeft₄ E).obj L₁).obj L₂).obj L₃).obj L₄).obj F' ≅ F
 
@@ -77,8 +80,11 @@ variable (F : C₁ ⥤ C₂ ⥤ C₃ ⥤ C₄ ⥤ E)
   [L₄.IsLocalization W₄] [W₁.ContainsIdentities] [W₂.ContainsIdentities]
   [W₃.ContainsIdentities] [W₄.ContainsIdentities]
 
-/-- The quadrifunctor on the localized categories induced by a quadrifunctor which inverts
-the four specified morphism properties. -/
+/-- Given localization functors `L₁ : C₁ ⥤ D₁`, `L₂ : C₂ ⥤ D₂`, `L₃ : C₃ ⥤ D₃` and
+`L₄ : C₄ ⥤ D₄` with respect to `W₁ : MorphismProperty C₁`, `W₂ : MorphismProperty C₂`,
+`W₃ : MorphismProperty C₃` and `W₄ : MorphismProperty C₄`, respectively, and a quadrifunctor
+`F : C₁ ⥤ C₂ ⥤ C₃ ⥤ C₄ ⥤ E` which inverts `W₁`, `W₂`, `W₃` and `W₄`, this is the induced
+localized quadrifunctor `D₁ ⥤ D₂ ⥤ D₃ ⥤ D₄ ⥤ E`. -/
 noncomputable def lift₄ : D₁ ⥤ D₂ ⥤ D₃ ⥤ D₄ ⥤ E :=
   curry₄.obj (lift (uncurry₄.obj F) hF (L₁.prod (L₂.prod (L₃.prod L₄))))
 
@@ -102,11 +108,11 @@ variable (L₁ : C₁ ⥤ D₁) (L₂ : C₂ ⥤ D₂) (L₃ : C₃ ⥤ D₃) (L
   (F₁ F₂ : C₁ ⥤ C₂ ⥤ C₃ ⥤ C₄ ⥤ E)
   (F₁' F₂' : D₁ ⥤ D₂ ⥤ D₃ ⥤ D₄ ⥤ E)
   [Lifting₄ L₁ L₂ L₃ L₄ W₁ W₂ W₃ W₄ F₁ F₁']
-  [Lifting₄ L₁ L₂ L₃ L₄ W₁ W₂ W₃ W₄ F₂ F₂']
+  [Lifting₄ L₁ L₂ L₃ L₄ W₁ W₂ W₃ W₄ F₂ F₂'] (τ : F₁ ⟶ F₂) (e : F₁ ≅ F₂)
 
-/-- The natural transformation of quadrifunctors induced by a natural transformation between
-their lifts before localization. -/
-noncomputable def lift₄NatTrans (τ : F₁ ⟶ F₂) : F₁' ⟶ F₂' :=
+/-- The natural transformation `F₁' ⟶ F₂'` of quadrifunctors induced by a natural transformation
+`τ : F₁ ⟶ F₂` when `F₁'` and `F₂'` lift `F₁` and `F₂`, respectively. -/
+noncomputable def lift₄NatTrans : F₁' ⟶ F₂' :=
   fullyFaithfulUncurry₄.preimage
     (liftNatTrans (L₁.prod (L₂.prod (L₃.prod L₄))) (W₁.prod (W₂.prod (W₃.prod W₄)))
       (uncurry₄.obj F₁) (uncurry₄.obj F₂) (uncurry₄.obj F₁') (uncurry₄.obj F₂')
@@ -115,8 +121,7 @@ noncomputable def lift₄NatTrans (τ : F₁ ⟶ F₂) : F₁' ⟶ F₂' :=
 set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in
 @[simp]
-theorem lift₄NatTrans_app_app_app_app (τ : F₁ ⟶ F₂)
-    (X₁ : C₁) (X₂ : C₂) (X₃ : C₃) (X₄ : C₄) :
+theorem lift₄NatTrans_app_app_app_app (X₁ : C₁) (X₂ : C₂) (X₃ : C₃) (X₄ : C₄) :
     ((((lift₄NatTrans L₁ L₂ L₃ L₄ W₁ W₂ W₃ W₄ F₁ F₂ F₁' F₂' τ).app
       (L₁.obj X₁)).app (L₂.obj X₂)).app (L₃.obj X₃)).app (L₄.obj X₄) =
         ((((Lifting₄.iso L₁ L₂ L₃ L₄ W₁ W₂ W₃ W₄ F₁ F₁').hom.app X₁).app X₂).app X₃).app X₄ ≫
@@ -142,25 +147,30 @@ theorem natTrans₄_ext {τ τ' : F₁' ⟶ F₂'}
     (natTrans_ext (L₁.prod (L₂.prod (L₃.prod L₄))) (W₁.prod (W₂.prod (W₃.prod W₄)))
       (fun _ ↦ h _ _ _ _))
 
-/-- The natural isomorphism of quadrifunctors induced by a natural isomorphism between their
-lifts before localization. -/
+set_option backward.defeqAttrib.useBackward true in
+/-- The natural isomorphism `F₁' ≅ F₂'` of quadrifunctors induced by a natural isomorphism
+`e : F₁ ≅ F₂` when `F₁'` and `F₂'` lift `F₁` and `F₂`, respectively. -/
 @[simps]
-noncomputable def lift₄NatIso (e : F₁ ≅ F₂) : F₁' ≅ F₂' where
+noncomputable def lift₄NatIso : F₁' ≅ F₂' where
   hom := lift₄NatTrans L₁ L₂ L₃ L₄ W₁ W₂ W₃ W₄ F₁ F₂ F₁' F₂' e.hom
   inv := lift₄NatTrans L₁ L₂ L₃ L₄ W₁ W₂ W₃ W₄ F₂ F₁ F₂' F₁' e.inv
   hom_inv_id := natTrans₄_ext L₁ L₂ L₃ L₄ W₁ W₂ W₃ W₄
     (fun X₁ X₂ X₃ X₄ ↦ by
       simp only [NatTrans.comp_app, lift₄NatTrans_app_app_app_app, NatTrans.id_app]
-      let e₁ := ((((Lifting₄.iso L₁ L₂ L₃ L₄ W₁ W₂ W₃ W₄ F₁ F₁').app X₁).app X₂).app X₃).app X₄
+      let e₁ :=
+        ((((Lifting₄.iso L₁ L₂ L₃ L₄ W₁ W₂ W₃ W₄ F₁ F₁').app X₁).app X₂).app X₃).app X₄
       let e₂ := (((e.app X₁).app X₂).app X₃).app X₄
-      let e₃ := ((((Lifting₄.iso L₁ L₂ L₃ L₄ W₁ W₂ W₃ W₄ F₂ F₂').app X₁).app X₂).app X₃).app X₄
+      let e₃ :=
+        ((((Lifting₄.iso L₁ L₂ L₃ L₄ W₁ W₂ W₃ W₄ F₂ F₂').app X₁).app X₂).app X₃).app X₄
       simpa [e₁, e₂, e₃, Category.assoc] using (e₁ ≪≫ e₂ ≪≫ e₃.symm).hom_inv_id)
   inv_hom_id := natTrans₄_ext L₁ L₂ L₃ L₄ W₁ W₂ W₃ W₄
     (fun X₁ X₂ X₃ X₄ ↦ by
       simp only [NatTrans.comp_app, lift₄NatTrans_app_app_app_app, NatTrans.id_app]
-      let e₁ := ((((Lifting₄.iso L₁ L₂ L₃ L₄ W₁ W₂ W₃ W₄ F₁ F₁').app X₁).app X₂).app X₃).app X₄
+      let e₁ :=
+        ((((Lifting₄.iso L₁ L₂ L₃ L₄ W₁ W₂ W₃ W₄ F₁ F₁').app X₁).app X₂).app X₃).app X₄
       let e₂ := (((e.app X₁).app X₂).app X₃).app X₄
-      let e₃ := ((((Lifting₄.iso L₁ L₂ L₃ L₄ W₁ W₂ W₃ W₄ F₂ F₂').app X₁).app X₂).app X₃).app X₄
+      let e₃ :=
+        ((((Lifting₄.iso L₁ L₂ L₃ L₄ W₁ W₂ W₃ W₄ F₂ F₂').app X₁).app X₂).app X₃).app X₄
       simpa [e₁, e₂, e₃, Category.assoc] using (e₃ ≪≫ e₂.symm ≪≫ e₁.symm).hom_inv_id)
 
 end

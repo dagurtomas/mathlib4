@@ -508,12 +508,6 @@ def whiskeringLeft₄Obj (F₁ : C₁ ⥤ D₁) :
       (D₁ ⥤ D₂ ⥤ D₃ ⥤ D₄ ⥤ E) ⥤ (C₁ ⥤ C₂ ⥤ C₃ ⥤ C₄ ⥤ E) where
   obj F₂ := whiskeringLeft₄ObjObj C₃ C₄ D₃ D₄ E F₁ F₂
   map τ₂ := whiskeringLeft₄ObjMap C₃ C₄ D₃ D₄ E F₁ τ₂
-  map_id F₂ := by
-    ext
-    simp [whiskeringLeft₄ObjMap]
-  map_comp τ₂ τ₂' := by
-    ext
-    simp [whiskeringLeft₄ObjMap]
 
 variable (C₂ C₃ C₄ D₂ D₃ D₄) in
 /-- Auxiliary definition for `whiskeringLeft₄`. -/
@@ -522,23 +516,16 @@ def whiskeringLeft₄Map {F₁ F₁' : C₁ ⥤ D₁} (τ₁ : F₁ ⟶ F₁') :
     whiskeringLeft₄Obj C₂ C₃ C₄ D₂ D₃ D₄ E F₁ ⟶
       whiskeringLeft₄Obj C₂ C₃ C₄ D₂ D₃ D₄ E F₁' where
   app F₂ := { app F₃ := { app F₄ := whiskerLeft _ ((whiskeringLeft _ _ _).map τ₁) } }
-  naturality _ _ τ₂ := by
-    ext
-    simp [whiskeringLeft₄ObjMap]
 
-/-- Simultaneous precomposition of a functor in four variables. -/
+/-- The obvious functor
+`(C₁ ⥤ D₁) ⥤ (C₂ ⥤ D₂) ⥤ (C₃ ⥤ D₃) ⥤ (C₄ ⥤ D₄) ⥤`
+`(D₁ ⥤ D₂ ⥤ D₃ ⥤ D₄ ⥤ E) ⥤ (C₁ ⥤ C₂ ⥤ C₃ ⥤ C₄ ⥤ E)`. -/
 @[simps!, implicit_reducible]
 def whiskeringLeft₄ :
     (C₁ ⥤ D₁) ⥤ (C₂ ⥤ D₂) ⥤ (C₃ ⥤ D₃) ⥤ (C₄ ⥤ D₄) ⥤
       (D₁ ⥤ D₂ ⥤ D₃ ⥤ D₄ ⥤ E) ⥤ (C₁ ⥤ C₂ ⥤ C₃ ⥤ C₄ ⥤ E) where
   obj F₁ := whiskeringLeft₄Obj C₂ C₃ C₄ D₂ D₃ D₄ E F₁
   map τ₁ := whiskeringLeft₄Map C₂ C₃ C₄ D₂ D₃ D₄ E τ₁
-  map_id F₁ := by
-    ext
-    simp [whiskeringLeft₄Map]
-  map_comp τ₁ τ₁' := by
-    ext
-    simp [whiskeringLeft₄Map]
 
 variable {E}
 
