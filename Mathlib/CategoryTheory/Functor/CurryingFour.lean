@@ -129,4 +129,51 @@ def curry₄ObjProdComp (F₁ : C₁ ⥤ D₁) (F₂ : C₂ ⥤ D₂) (F₃ : C�
 
 end Functor
 
+variable {C₁ C₂ C₃ C₄ C₂₃₄ C₃₄ E : Type*}
+  [Category* C₁] [Category* C₂] [Category* C₃] [Category* C₄]
+  [Category* C₂₃₄] [Category* C₃₄] [Category* E]
+
+/-- Compose a bifunctor in the first variable with a trifunctor in the last three variables. -/
+@[simps]
+def trifunctorComp₂₃₄ (F : C₁ ⥤ C₂₃₄ ⥤ E) (G : C₂ ⥤ C₃ ⥤ C₄ ⥤ C₂₃₄) :
+    C₁ ⥤ C₂ ⥤ C₃ ⥤ C₄ ⥤ E where
+  obj X₁ := (Functor.postcompose₃.obj (F.obj X₁)).obj G
+  map f := (Functor.postcompose₃.map (F.map f)).app G
+
+set_option backward.isDefEq.respectTransparency false in
+/-- Composition in the last three variables, as a functor in the trifunctor being composed. -/
+@[simps]
+def trifunctorComp₂₃₄Functor (F : C₁ ⥤ C₂₃₄ ⥤ E) :
+    (C₂ ⥤ C₃ ⥤ C₄ ⥤ C₂₃₄) ⥤ C₁ ⥤ C₂ ⥤ C₃ ⥤ C₄ ⥤ E where
+  obj G := trifunctorComp₂₃₄ F G
+  map {G G'} τ :=
+    { app X₁ := (Functor.postcompose₃.obj (F.obj X₁)).map τ
+      naturality X₁ Y₁ f := by
+        ext X₂ X₃ X₄
+        change (F.map f).app (((G.obj X₂).obj X₃).obj X₄) ≫
+            (F.obj Y₁).map ((((τ.app X₂).app X₃).app X₄)) =
+          (F.obj X₁).map ((((τ.app X₂).app X₃).app X₄)) ≫
+            (F.map f).app (((G'.obj X₂).obj X₃).obj X₄)
+        exact ((F.map f).naturality _).symm }
+
+/-- Substitute a bifunctor into the third variable of a trifunctor. -/
+@[simps]
+def trifunctorComp₃₄ (F : C₁ ⥤ C₂ ⥤ C₃₄ ⥤ E) (G : C₃ ⥤ C₄ ⥤ C₃₄) :
+    C₁ ⥤ C₂ ⥤ C₃ ⥤ C₄ ⥤ E where
+  obj X₁ := bifunctorComp₂₃ (F.obj X₁) G
+  map f := (bifunctorComp₂₃Functor.map (F.map f)).app G
+
+set_option backward.isDefEq.respectTransparency false in
+/-- Substitution in the third variable, as a functor in the trifunctor being composed. -/
+@[simps]
+def trifunctorComp₃₄Functor (G : C₃ ⥤ C₄ ⥤ C₃₄) :
+    (C₁ ⥤ C₂ ⥤ C₃₄ ⥤ E) ⥤ C₁ ⥤ C₂ ⥤ C₃ ⥤ C₄ ⥤ E where
+  obj F := trifunctorComp₃₄ F G
+  map {F F'} τ :=
+    { app X₁ := (bifunctorComp₂₃Functor.map (τ.app X₁)).app G
+      naturality X₁ Y₁ f := by
+        ext X₂ X₃ X₄
+        exact NatTrans.congr_app (NatTrans.congr_app (τ.naturality f) X₂)
+          ((G.obj X₃).obj X₄) }
+
 end CategoryTheory
